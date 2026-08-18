@@ -358,5 +358,30 @@ function openDoor() {
 
 </script>
 
+let drawerOpen = false;
+let keyTaken = false;
+
+function openDrawer() {
+    if (drawerOpen) return;
+
+    drawerOpen = true;
+
+    document.getElementById("key").style.display = "block";
+
+    say("You open the drawer. There's a key inside.");
+}
+
+function takeKey() {
+    if (keyTaken) return;
+
+    keyTaken = true;
+
+    document.getElementById("key").style.display = "none";
+
+    addItem("KEY");
+
+    say("You picked up the key.");
+}
+   
 </body>
 </html>
