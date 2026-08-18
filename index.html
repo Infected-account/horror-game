@@ -27,8 +27,6 @@
             radial-gradient(circle at center, #303030 0%, #111 70%);
     }
 
-    /* ROOM */
-
     #room {
         position: absolute;
         inset: 0;
@@ -45,7 +43,7 @@
         outline: 1px solid #777;
     }
 
-    /* Door */
+    /* DOOR */
 
     #door {
         width: 130px;
@@ -66,7 +64,7 @@
         background: #aaa;
     }
 
-    /* Desk */
+    /* DESK */
 
     #desk {
         width: 300px;
@@ -76,15 +74,20 @@
         bottom: 20%;
         border: 5px solid #17100c;
     }
-#key {
-    position: absolute;
-    left: 20%;
-    bottom: 27%;
-    font-size: 30px;
-    display: none;
-    cursor: pointer;
-}
-   
+
+    /* KEY */
+
+    #key {
+        position: absolute;
+        left: 20%;
+        bottom: 27%;
+        font-size: 30px;
+        display: none;
+        cursor: pointer;
+    }
+
+    /* COMPUTER */
+
     #computer {
         width: 120px;
         height: 90px;
@@ -105,7 +108,7 @@
         font-size: 11px;
     }
 
-    /* Note */
+    /* NOTE */
 
     #note {
         width: 55px;
@@ -119,7 +122,7 @@
         transform: rotate(-5deg);
     }
 
-    /* Window */
+    /* WINDOW */
 
     #window {
         width: 180px;
@@ -130,7 +133,7 @@
         top: 15%;
     }
 
-    /* UI */
+    /* DIALOGUE */
 
     #dialogue {
         position: absolute;
@@ -148,6 +151,8 @@
     #dialogueText {
         line-height: 1.5;
     }
+
+    /* INVENTORY */
 
     #inventory {
         position: absolute;
@@ -212,21 +217,29 @@
             ROOM 01 // BEDROOM
         </div>
 
+        <!-- WINDOW -->
+
         <div id="window"
              class="object"
              onclick="inspectWindow()">
         </div>
 
-       <div id="desk"
-     class="object"
-     onclick="openDrawer()">
-</div>
+        <!-- DESK -->
 
-<div id="key"
-     class="object"
-     onclick="takeKey()">
-    🔑
-</div>
+        <div id="desk"
+             class="object"
+             onclick="openDrawer()">
+        </div>
+
+        <!-- KEY -->
+
+        <div id="key"
+             class="object"
+             onclick="takeKey()">
+            🔑
+        </div>
+
+        <!-- COMPUTER -->
 
         <div id="computer"
              class="object"
@@ -238,11 +251,15 @@
 
         </div>
 
+        <!-- NOTE -->
+
         <div id="note"
              class="object"
              onclick="readNote()">
             DON'T
         </div>
+
+        <!-- DOOR -->
 
         <div id="door"
              class="object"
@@ -254,37 +271,68 @@
 
     </div>
 
+    <!-- DIALOGUE -->
+
     <div id="dialogue" onclick="closeDialogue()">
         <div id="dialogueText"></div>
     </div>
 
+    <!-- INVENTORY -->
+
     <div id="inventory">
-        <div class="item" id="item1">EMPTY</div>
-        <div class="item" id="item2">EMPTY</div>
-        <div class="item" id="item3">EMPTY</div>
-        <div class="item" id="item4">EMPTY</div>
+
+        <div class="item" id="item1">
+            EMPTY
+        </div>
+
+        <div class="item" id="item2">
+            EMPTY
+        </div>
+
+        <div class="item" id="item3">
+            EMPTY
+        </div>
+
+        <div class="item" id="item4">
+            EMPTY
+        </div>
+
     </div>
 
 </div>
 
 <div id="flash"></div>
 
+
 <script>
 
 let inventory = [];
 
+let drawerOpen = false;
+let keyTaken = false;
+
+
 function say(text) {
+
     document.getElementById("dialogueText").innerText = text;
+
     document.getElementById("dialogue").style.display = "block";
+
 }
 
+
 function closeDialogue() {
+
     document.getElementById("dialogue").style.display = "none";
+
 }
+
 
 function addItem(item) {
 
-    if (inventory.includes(item)) return;
+    if (inventory.includes(item)) {
+        return;
+    }
 
     inventory.push(item);
 
@@ -295,7 +343,11 @@ function addItem(item) {
     if (slot) {
         slot.innerText = item;
     }
+
 }
+
+
+/* NOTE */
 
 function readNote() {
 
@@ -306,14 +358,8 @@ function readNote() {
 
 }
 
-function inspectDesk() {
 
-    say(
-        "The desk is covered in dust. " +
-        "There are scratches underneath it."
-    );
-
-}
+/* COMPUTER */
 
 function inspectComputer() {
 
@@ -326,6 +372,9 @@ function inspectComputer() {
 
 }
 
+
+/* WINDOW */
+
 function inspectWindow() {
 
     say(
@@ -336,6 +385,50 @@ function inspectWindow() {
     );
 
 }
+
+
+/* DESK DRAWER */
+
+function openDrawer() {
+
+    if (drawerOpen) {
+        return;
+    }
+
+    drawerOpen = true;
+
+    document.getElementById("key").style.display = "block";
+
+    say(
+        "You open the drawer.\n\n" +
+        "There's a key inside."
+    );
+
+}
+
+
+/* TAKE KEY */
+
+function takeKey() {
+
+    if (keyTaken) {
+        return;
+    }
+
+    keyTaken = true;
+
+    document.getElementById("key").style.display = "none";
+
+    addItem("KEY");
+
+    say(
+        "You picked up the key."
+    );
+
+}
+
+
+/* DOOR */
 
 function openDoor() {
 
@@ -358,30 +451,5 @@ function openDoor() {
 
 </script>
 
-let drawerOpen = false;
-let keyTaken = false;
-
-function openDrawer() {
-    if (drawerOpen) return;
-
-    drawerOpen = true;
-
-    document.getElementById("key").style.display = "block";
-
-    say("You open the drawer. There's a key inside.");
-}
-
-function takeKey() {
-    if (keyTaken) return;
-
-    keyTaken = true;
-
-    document.getElementById("key").style.display = "none";
-
-    addItem("KEY");
-
-    say("You picked up the key.");
-}
-   
 </body>
 </html>
