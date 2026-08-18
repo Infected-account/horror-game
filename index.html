@@ -389,7 +389,7 @@ function inspectWindow() {
 
 /* DESK DRAWER */
 
-function openDrawer() {
+window.openDrawer = function() {
 
     if (drawerOpen) {
         return;
@@ -409,7 +409,7 @@ function openDrawer() {
 
 /* TAKE KEY */
 
-function takeKey() {
+window.takeKey = function() {
 
     if (keyTaken) {
         return;
