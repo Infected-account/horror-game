@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROAM0210</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: #080808;
+        color: #ddd;
+        font-family: monospace;
+        overflow: hidden;
+    }
+
+    #game {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        background:
+            linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.65)),
+            radial-gradient(circle at center, #303030 0%, #111 70%);
+    }
+
+    /* ROOM */
+
+    #room {
+        position: absolute;
+        inset: 0;
+    }
+
+    .object {
+        position: absolute;
+        cursor: pointer;
+        transition: .15s;
+    }
+
+    .object:hover {
+        filter: brightness(1.5);
+        outline: 1px solid #777;
+    }
+
+    /* Door */
+
+    #door {
+        width: 130px;
+        height: 280px;
+        background: #211813;
+        border: 6px solid #0d0b0a;
+        right: 12%;
+        bottom: 15%;
+    }
+
+    #doorknob {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #aaa;
+    }
+
+    /* Desk */
+
+    #desk {
+        width: 300px;
+        height: 80px;
+        background: #35261d;
+        left: 10%;
+        bottom: 20%;
+        border: 5px solid #17100c;
+    }
+
+    #computer {
+        width: 120px;
+        height: 90px;
+        background: #111;
+        border: 7px solid #222;
+        left: 25%;
+        bottom: 29%;
+    }
+
+    #computerScreen {
+        width: 90px;
+        height: 55px;
+        margin: 10px auto;
+        background: #172019;
+        color: #4cff72;
+        text-align: center;
+        padding-top: 18px;
+        font-size: 11px;
+    }
+
+    /* Note */
+
+    #note {
+        width: 55px;
+        height: 75px;
+        background: #d6c99e;
+        color: #111;
+        left: 18%;
+        bottom: 27%;
+        padding: 8px;
+        font-size: 9px;
+        transform: rotate(-5deg);
+    }
+
+    /* Window */
+
+    #window {
+        width: 180px;
+        height: 150px;
+        background: #070b12;
+        border: 10px solid #30251d;
+        left: 42%;
+        top: 15%;
+    }
+
+    /* UI */
+
+    #dialogue {
+        position: absolute;
+        left: 5%;
+        right: 5%;
+        bottom: 90px;
+        min-height: 80px;
+        background: rgba(0,0,0,.9);
+        border: 1px solid #555;
+        padding: 18px;
+        display: none;
+        cursor: pointer;
+    }
+
+    #dialogueText {
+        line-height: 1.5;
+    }
+
+    #inventory {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 65px;
+        background: #090909;
+        border-top: 1px solid #444;
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .item {
+        width: 50px;
+        height: 50px;
+        border: 1px solid #444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+    }
+
+    #roomName {
+        position: absolute;
+        top: 15px;
+        left: 20px;
+        color: #777;
+        font-size: 13px;
+    }
+
+    #flash {
+        position: fixed;
+        inset: 0;
+        background: white;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 99;
+    }
+
+    .flash {
+        animation: flash .3s;
+    }
+
+    @keyframes flash {
+        0% { opacity: 0; }
+        50% { opacity: .8; }
+        100% { opacity: 0; }
+    }
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <div id="room">
+
+        <div id="roomName">
+            ROOM 01 // BEDROOM
+        </div>
+
+        <div id="window"
+             class="object"
+             onclick="inspectWindow()">
+        </div>
+
+        <div id="desk"
+             class="object"
+             onclick="inspectDesk()">
+        </div>
+
+        <div id="computer"
+             class="object"
+             onclick="inspectComputer()">
+
+            <div id="computerScreen">
+                NO SIGNAL
+            </div>
+
+        </div>
+
+        <div id="note"
+             class="object"
+             onclick="readNote()">
+            DON'T
+        </div>
+
+        <div id="door"
+             class="object"
+             onclick="openDoor()">
+
+            <div id="doorknob"></div>
+
+        </div>
+
+    </div>
+
+    <div id="dialogue" onclick="closeDialogue()">
+        <div id="dialogueText"></div>
+    </div>
+
+    <div id="inventory">
+        <div class="item" id="item1">EMPTY</div>
+        <div class="item" id="item2">EMPTY</div>
+        <div class="item" id="item3">EMPTY</div>
+        <div class="item" id="item4">EMPTY</div>
+    </div>
+
+</div>
+
+<div id="flash"></div>
+
+<script>
+
+let inventory = [];
+
+function say(text) {
+    document.getElementById("dialogueText").innerText = text;
+    document.getElementById("dialogue").style.display = "block";
+}
+
+function closeDialogue() {
+    document.getElementById("dialogue").style.display = "none";
+}
+
+function addItem(item) {
+
+    if (inventory.includes(item)) return;
+
+    inventory.push(item);
+
+    const slot = document.querySelector(
+        `.item:nth-child(${inventory.length})`
+    );
+
+    if (slot) {
+        slot.innerText = item;
+    }
+}
+
+function readNote() {
+
+    say(
+        "The paper is old. Someone wrote this recently. " +
+        "There is only one sentence: \"DO NOT OPEN THE DOOR.\""
+    );
+
+}
+
+function inspectDesk() {
+
+    say(
+        "The desk is covered in dust. " +
+        "There are scratches underneath it."
+    );
+
+}
+
+function inspectComputer() {
+
+    say(
+        "The computer turns on by itself.\n\n" +
+        "NO SIGNAL\n\n" +
+        "Then a message appears:\n\n" +
+        "HELLO, EVAN."
+    );
+
+}
+
+function inspectWindow() {
+
+    say(
+        "You look outside.\n\n" +
+        "There is nothing there.\n\n" +
+        "You look again.\n\n" +
+        "Something is standing in the distance."
+    );
+
+}
+
+function openDoor() {
+
+    if (!inventory.includes("KEY")) {
+
+        say(
+            "The door won't open.\n\n" +
+            "It's locked."
+        );
+
+        return;
+    }
+
+    say(
+        "The key fits.\n\n" +
+        "The door opens."
+    );
+
+}
+
+</script>
+
+</body>
+</html>
