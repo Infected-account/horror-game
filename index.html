@@ -6,208 +6,297 @@
 <title>IDK</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
 
-    body {
-        margin: 0;
-        background: #080808;
-        color: #ddd;
-        font-family: monospace;
-        overflow: hidden;
-    }
+* {
+    box-sizing: border-box;
+}
 
-    #game {
-        width: 100vw;
-        height: 100vh;
-        position: relative;
-        background:
-            linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.65)),
-            radial-gradient(circle at center, #303030 0%, #111 70%);
-    }
+body {
+    margin: 0;
+    background: #080808;
+    color: #ddd;
+    font-family: monospace;
+    overflow: hidden;
+}
 
-    #room {
-        position: absolute;
-        inset: 0;
-    }
+#game {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
 
-    .object {
-        position: absolute;
-        cursor: pointer;
-        transition: .15s;
-    }
+    background:
+        linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.65)),
+        radial-gradient(circle at center, #303030 0%, #111 70%);
+}
 
-    .object:hover {
-        filter: brightness(1.5);
-        outline: 1px solid #777;
-    }
-
-    /* DOOR */
-
-    #door {
-        width: 130px;
-        height: 280px;
-        background: #211813;
-        border: 6px solid #0d0b0a;
-        right: 12%;
-        bottom: 15%;
-    }
-
-    #doorknob {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: #aaa;
-    }
-
-    /* DESK */
-
-    #desk {
-        width: 300px;
-        height: 80px;
-        background: #35261d;
-        left: 10%;
-        bottom: 20%;
-        border: 5px solid #17100c;
-    }
-
-    /* KEY */
-
-    #key {
+#room {
     position: absolute;
+    inset: 0;
+}
+
+.object {
+    position: absolute;
+    cursor: pointer;
+    transition: .15s;
+}
+
+.object:hover {
+    filter: brightness(1.5);
+    outline: 1px solid #777;
+}
+
+
+/* DOOR */
+
+#door {
+    width: 130px;
+    height: 280px;
+    background: #211813;
+    border: 6px solid #0d0b0a;
+
+    right: 12%;
+    bottom: 15%;
+
+    z-index: 2;
+}
+
+#doorknob {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+
+    width: 14px;
+    height: 14px;
+
+    border-radius: 50%;
+    background: #aaa;
+}
+
+
+/* DESK */
+
+#desk {
+    width: 300px;
+    height: 80px;
+
+    background: #35261d;
+    border: 5px solid #17100c;
+
+    left: 10%;
+    bottom: 20%;
+
+    z-index: 1;
+}
+
+
+/* KEY */
+
+#key {
+    position: absolute;
+
     left: 22%;
     bottom: 29%;
+
     font-size: 30px;
+
     display: none;
+
     cursor: pointer;
+
     z-index: 5;
 }
 
-    /* COMPUTER */
 
-    #computer {
-        width: 120px;
-        height: 90px;
-        background: #111;
-        border: 7px solid #222;
-        left: 25%;
-        bottom: 29%;
-    }
+/* COMPUTER */
 
-    #computerScreen {
-        width: 90px;
-        height: 55px;
-        margin: 10px auto;
-        background: #172019;
-        color: #4cff72;
-        text-align: center;
-        padding-top: 18px;
-        font-size: 11px;
-    }
+#computer {
+    width: 120px;
+    height: 90px;
 
-    /* NOTE */
+    background: #111;
+    border: 7px solid #222;
 
-    #note {
-        width: 55px;
-        height: 75px;
-        background: #d6c99e;
-        color: #111;
-        left: 18%;
-        bottom: 27%;
-        padding: 8px;
-        font-size: 9px;
-        transform: rotate(-5deg);
-    }
+    left: 25%;
+    bottom: 29%;
 
-    /* WINDOW */
+    z-index: 2;
+}
 
-    #window {
-        width: 180px;
-        height: 150px;
-        background: #070b12;
-        border: 10px solid #30251d;
-        left: 42%;
-        top: 15%;
-    }
+#computerScreen {
+    width: 90px;
+    height: 55px;
 
-    /* DIALOGUE */
+    margin: 10px auto;
 
-   #dialogue {
+    background: #172019;
+    color: #4cff72;
+
+    text-align: center;
+
+    padding-top: 18px;
+
+    font-size: 11px;
+}
+
+
+/* NOTE */
+
+#note {
+    width: 55px;
+    height: 75px;
+
+    background: #d6c99e;
+    color: #111;
+
+    left: 18%;
+    bottom: 27%;
+
+    padding: 8px;
+
+    font-size: 9px;
+
+    transform: rotate(-5deg);
+
+    z-index: 3;
+}
+
+
+/* WINDOW */
+
+#window {
+    width: 180px;
+    height: 150px;
+
+    background: #070b12;
+    border: 10px solid #30251d;
+
+    left: 42%;
+    top: 15%;
+
+    z-index: 1;
+}
+
+
+/* DIALOGUE */
+
+#dialogue {
     position: absolute;
+
     left: 5%;
     right: 5%;
     bottom: 90px;
+
     min-height: 80px;
+
     background: rgba(0,0,0,.9);
     border: 1px solid #555;
+
     padding: 18px;
+
     display: none;
+
     cursor: pointer;
+
     z-index: 10;
 }
 
-    #dialogueText {
-        line-height: 1.5;
-    }
+#dialogueText {
+    line-height: 1.5;
+}
 
-    /* INVENTORY */
 
-    #inventory {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 65px;
-        background: #090909;
-        border-top: 1px solid #444;
-        display: flex;
-        align-items: center;
-        padding: 8px;
-        gap: 8px;
-    }
+/* INVENTORY */
 
-    .item {
-        width: 50px;
-        height: 50px;
-        border: 1px solid #444;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-    }
+#inventory {
+    position: absolute;
 
-    #roomName {
-        position: absolute;
-        top: 15px;
-        left: 20px;
-        color: #777;
-        font-size: 13px;
-    }
+    bottom: 0;
+    left: 0;
+    right: 0;
 
-    #flash {
-        position: fixed;
-        inset: 0;
-        background: white;
+    height: 65px;
+
+    background: #090909;
+
+    border-top: 1px solid #444;
+
+    display: flex;
+    align-items: center;
+
+    padding: 8px;
+
+    gap: 8px;
+
+    z-index: 20;
+}
+
+.item {
+    width: 50px;
+    height: 50px;
+
+    border: 1px solid #444;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 11px;
+}
+
+
+/* ROOM NAME */
+
+#roomName {
+    position: absolute;
+
+    top: 15px;
+    left: 20px;
+
+    color: #777;
+
+    font-size: 13px;
+}
+
+
+/* FLASH */
+
+#flash {
+    position: fixed;
+
+    inset: 0;
+
+    background: white;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    z-index: 99;
+}
+
+.flash {
+    animation: flash .3s;
+}
+
+@keyframes flash {
+
+    0% {
         opacity: 0;
-        pointer-events: none;
-        z-index: 99;
     }
 
-    .flash {
-        animation: flash .3s;
+    50% {
+        opacity: .8;
     }
 
-    @keyframes flash {
-        0% { opacity: 0; }
-        50% { opacity: .8; }
-        100% { opacity: 0; }
+    100% {
+        opacity: 0;
     }
+
+}
+
 </style>
 </head>
+
 
 <body>
 
@@ -219,33 +308,43 @@
             ROOM 01 // BEDROOM
         </div>
 
+
         <!-- WINDOW -->
 
-        <div id="window"
-             class="object"
-             onclick="inspectWindow()">
+        <div
+            id="window"
+            class="object"
+            onclick="inspectWindow()">
         </div>
+
 
         <!-- DESK -->
 
-        <div id="desk"
-             class="object"
-             onclick="openDrawer()">
+        <div
+            id="desk"
+            class="object"
+            onclick="openDrawer()">
         </div>
+
 
         <!-- KEY -->
 
-        <div id="key"
-             class="object"
-             onclick="takeKey()">
+        <div
+            id="key"
+            class="object"
+            onclick="takeKey()">
+
             🔑
+
         </div>
+
 
         <!-- COMPUTER -->
 
-        <div id="computer"
-             class="object"
-             onclick="inspectComputer()">
+        <div
+            id="computer"
+            class="object"
+            onclick="inspectComputer()">
 
             <div id="computerScreen">
                 NO SIGNAL
@@ -253,49 +352,43 @@
 
         </div>
 
+
         <!-- NOTE -->
 
-        <div id="note"
-             class="object"
-             onclick="readNote()">
+        <div
+            id="note"
+            class="object"
+            onclick="readNote()">
+
             DON'T
+
         </div>
+
 
         <!-- DOOR -->
 
-    /* DOOR */
+        <div
+            id="door"
+            class="object"
+            onclick="openDoor()">
 
-window.openDoor = function() {
+            <div id="doorknob"></div>
 
-    if (!inventory.includes("KEY")) {
+        </div>
 
-        say(
-            "The door won't open.\n\n" +
-            "It's locked."
-        );
+    </div>
 
-        return;
-    }
-
-    say(
-        "The key fits.\n\n" +
-        "The door slowly opens..."
-    );
-
-    setTimeout(function() {
-
-        document.getElementById("door").style.transform = "translateX(150px)";
-        document.getElementById("door").style.opacity = "0";
-
-    }, 1000);
-
-};
 
     <!-- DIALOGUE -->
 
-    <div id="dialogue" onclick="closeDialogue()">
+    <div
+        id="dialogue"
+        onclick="closeDialogue()">
+
         <div id="dialogueText"></div>
+
     </div>
+
 
     <!-- INVENTORY -->
 
@@ -321,6 +414,7 @@ window.openDoor = function() {
 
 </div>
 
+
 <div id="flash"></div>
 
 
@@ -329,8 +423,13 @@ window.openDoor = function() {
 let inventory = [];
 
 let drawerOpen = false;
+
 let keyTaken = false;
 
+let doorOpened = false;
+
+
+/* DIALOGUE */
 
 function say(text) {
 
@@ -347,6 +446,8 @@ function closeDialogue() {
 
 }
 
+
+/* INVENTORY */
 
 function addItem(item) {
 
@@ -372,8 +473,9 @@ function addItem(item) {
 function readNote() {
 
     say(
-        "The paper is old. Someone wrote this recently. " +
-        "There is only one sentence: \"DO NOT OPEN THE DOOR.\""
+        "The paper is old.\n\n" +
+        "Someone wrote this recently.\n\n" +
+        "\"DO NOT OPEN THE DOOR.\""
     );
 
 }
@@ -407,11 +509,14 @@ function inspectWindow() {
 }
 
 
-/* DESK DRAWER */
+/* DESK */
 
-window.openDrawer = function() {
+function openDrawer() {
 
     if (drawerOpen) {
+
+        say("The drawer is already open.");
+
         return;
     }
 
@@ -427,9 +532,9 @@ window.openDrawer = function() {
 }
 
 
-/* TAKE KEY */
+/* KEY */
 
-window.takeKey = function() {
+function takeKey() {
 
     if (keyTaken) {
         return;
@@ -452,6 +557,10 @@ window.takeKey = function() {
 
 function openDoor() {
 
+    if (doorOpened) {
+        return;
+    }
+
     if (!inventory.includes("KEY")) {
 
         say(
@@ -462,10 +571,22 @@ function openDoor() {
         return;
     }
 
+    doorOpened = true;
+
     say(
         "The key fits.\n\n" +
-        "The door opens."
+        "The door slowly opens..."
     );
+
+    setTimeout(function() {
+
+        const door = document.getElementById("door");
+
+        door.style.transform = "translateX(150px)";
+
+        door.style.opacity = "0";
+
+    }, 1000);
 
 }
 
