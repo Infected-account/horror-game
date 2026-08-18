@@ -135,18 +135,19 @@
 
     /* DIALOGUE */
 
-    #dialogue {
-        position: absolute;
-        left: 5%;
-        right: 5%;
-        bottom: 90px;
-        min-height: 80px;
-        background: rgba(0,0,0,.9);
-        border: 1px solid #555;
-        padding: 18px;
-        display: none;
-        cursor: pointer;
-    }
+   #dialogue {
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    bottom: 90px;
+    min-height: 80px;
+    background: rgba(0,0,0,.9);
+    border: 1px solid #555;
+    padding: 18px;
+    display: none;
+    cursor: pointer;
+    z-index: 10;
+}
 
     #dialogueText {
         line-height: 1.5;
@@ -261,15 +262,33 @@
 
         <!-- DOOR -->
 
-        <div id="door"
-             class="object"
-             onclick="openDoor()">
+    /* DOOR */
 
-            <div id="doorknob"></div>
+window.openDoor = function() {
 
-        </div>
+    if (!inventory.includes("KEY")) {
 
-    </div>
+        say(
+            "The door won't open.\n\n" +
+            "It's locked."
+        );
+
+        return;
+    }
+
+    say(
+        "The key fits.\n\n" +
+        "The door slowly opens..."
+    );
+
+    setTimeout(function() {
+
+        document.getElementById("door").style.transform = "translateX(150px)";
+        document.getElementById("door").style.opacity = "0";
+
+    }, 1000);
+
+};
 
     <!-- DIALOGUE -->
 
