@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ROOM 03</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #000;
+    color: #ddd;
+    font-family: monospace;
+    overflow: hidden;
+}
+
+#game {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    background:
+        radial-gradient(circle at center, #151515 0%, #030303 70%);
+}
+
+/* ROOM */
+
+#room {
+    position: absolute;
+    inset: 0;
+}
+
+/* ROOM NAME */
+
+#roomName {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    color: #555;
+    font-size: 13px;
+    z-index: 20;
+}
+
+/* OBJECTS */
+
+.object {
+    position: absolute;
+    cursor: pointer;
+}
+
+/* CHAIR */
+
+#chair {
+    left: 30%;
+    top: 35%;
+
+    width: 90px;
+    height: 120px;
+
+    background: #292929;
+    border: 5px solid #111;
+
+    opacity: .7;
+}
+
+/* TABLE */
+
+#table {
+    right: 25%;
+    bottom: 25%;
+
+    width: 180px;
+    height: 60px;
+
+    background: #292929;
+    border: 5px solid #111;
+
+    opacity: .7;
+}
+
+/* LIGHT SWITCH */
+
+#switch {
+    right: 8%;
+    top: 45%;
+
+    width: 35px;
+    height: 60px;
+
+    background: #555;
+
+    border: 4px solid #222;
+
+    cursor: pointer;
+
+    z-index: 5;
+}
+
+#switchButton {
+    width: 12px;
+    height: 25px;
+
+    margin: 12px auto;
+
+    background: #aaa;
+}
+
+/* MONSTER */
+
+#monster {
+    position: absolute;
+
+    left: 55%;
+    top: 28%;
+
+    width: 100px;
+    height: 260px;
+
+    background: #050505;
+
+    border-radius: 50% 50% 10% 10%;
+
+    display: none;
+
+    z-index: 8;
+}
+
+/* monster head */
+
+#monsterHead {
+    position: absolute;
+
+    top: -20px;
+    left: 20px;
+
+    width: 60px;
+    height: 70px;
+
+    background: #050505;
+
+    border-radius: 50%;
+}
+
+/* monster eyes */
+
+.eye {
+    position: absolute;
+
+    width: 8px;
+    height: 8px;
+
+    background: white;
+
+    border-radius: 50%;
+
+    top: 25px;
+}
+
+#eye1 {
+    left: 15px;
+}
+
+#eye2 {
+    right: 15px;
+}
+
+/* DOOR */
+
+#door {
+    position: absolute;
+
+    right: 8%;
+    bottom: 15%;
+
+    width: 130px;
+    height: 280px;
+
+    background: #211813;
+
+    border: 6px solid #0d0b0a;
+
+    cursor: pointer;
+
+    z-index: 3;
+}
+
+#doorknob {
+    position: absolute;
+
+    right: 15px;
+    top: 50%;
+
+    width: 14px;
+    height: 14px;
+
+    border-radius: 50%;
+
+    background: #aaa;
+}
+
+/* FLASHLIGHT */
+
+#flashlight {
+    position: fixed;
+
+    width: 260px;
+    height: 260px;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    transform: translate(-50%, -50%);
+
+    z-index: 50;
+
+    background:
+        radial-gradient(
+            circle,
+            transparent 0%,
+            transparent 35%,
+            rgba(0,0,0,.25) 55%,
+            rgba(0,0,0,.75) 75%,
+            rgba(0,0,0,.98) 100%
+        );
+
+    mix-blend-mode: screen;
+}
+
+/* DARKNESS */
+
+#darkness {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,.96);
+
+    pointer-events: none;
+
+    z-index: 40;
+
+    -webkit-mask-image:
+        radial-gradient(
+            circle 130px at var(--x) var(--y),
+            transparent 0%,
+            rgba(0,0,0,.15) 45%,
+            black 100%
+        );
+
+    mask-image:
+        radial-gradient(
+            circle 130px at var(--x) var(--y),
+            transparent 0%,
+            rgba(0,0,0,.15) 45%,
+            black 100%
+        );
+}
+
+/* FULL LIGHT */
+
+#fullLight {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(255,255,255,.12);
+
+    display: none;
+
+    pointer-events: none;
+
+    z-index: 35;
+}
+
+/* FLICKER */
+
+.flicker {
+    animation: flicker .8s;
+}
+
+@keyframes flicker {
+
+    0% {
+        opacity: 1;
+    }
+
+    10% {
+        opacity: .2;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    35% {
+        opacity: .1;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    70% {
+        opacity: .3;
+    }
+
+    100% {
+        opacity: 1;
+    }
+
+}
+
+/* DIALOGUE */
+
+#dialogue {
+    position: absolute;
+
+    left: 5%;
+    right: 5%;
+    bottom: 90px;
+
+    min-height: 80px;
+
+    background: rgba(0,0,0,.95);
+
+    border: 1px solid #555;
+
+    padding: 18px;
+
+    display: none;
+
+    cursor: pointer;
+
+    z-index: 100;
+}
+
+#dialogueText {
+    line-height: 1.5;
+}
+
+/* INVENTORY */
+
+#inventory {
+    position: absolute;
+
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    height: 65px;
+
+    background: #090909;
+
+    border-top: 1px solid #444;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 8px;
+
+    gap: 8px;
+
+    z-index: 100;
+}
+
+.item {
+    width: 50px;
+    height: 50px;
+
+    border: 1px solid #444;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 11px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="game">
+
+    <div id="room">
+
+        <div id="roomName">
+            ROOM 03 // UNKNOWN
+        </div>
+
+
+        <!-- CHAIR -->
+
+        <div
+            id="chair"
+            class="object"
+            onclick="inspectChair()">
+        </div>
+
+
+        <!-- TABLE -->
+
+        <div
+            id="table"
+            class="object"
+            onclick="inspectTable()">
+        </div>
+
+
+        <!-- LIGHT SWITCH -->
+
+        <div
+            id="switch"
+            class="object"
+            onclick="flipSwitch()">
+
+            <div id="switchButton"></div>
+
+        </div>
+
+
+        <!-- MONSTER -->
+
+        <div id="monster">
+
+            <div id="monsterHead">
+
+                <div
+                    class="eye"
+                    id="eye1">
+                </div>
+
+                <div
+                    class="eye"
+                    id="eye2">
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- DOOR -->
+
+        <div
+            id="door"
+            class="object"
+            onclick="openDoor()">
+
+            <div id="doorknob"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FULL LIGHT -->
+
+    <div id="fullLight"></div>
+
+
+    <!-- FLASHLIGHT -->
+
+    <div id="flashlight"></div>
+
+
+    <!-- DARKNESS -->
+
+    <div id="darkness"></div>
+
+
+    <!-- DIALOGUE -->
+
+    <div
+        id="dialogue"
+        onclick="closeDialogue()">
+
+        <div id="dialogueText"></div>
+
+    </div>
+
+
+    <!-- INVENTORY -->
+
+    <div id="inventory">
+
+        <div class="item">EMPTY</div>
+        <div class="item">EMPTY</div>
+        <div class="item">EMPTY</div>
+        <div class="item">EMPTY</div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   GAME DATA
+========================= */
+
+let inventory =
+    JSON.parse(localStorage.getItem("inventory")) || [];
+
+let lightsOn = false;
+let monsterGone = false;
+
+
+/* =========================
+   DIALOGUE
+========================= */
+
+function say(text) {
+
+    document.getElementById("dialogueText").innerText = text;
+
+    document.getElementById("dialogue").style.display =
+        "block";
+
+}
+
+
+function closeDialogue() {
+
+    document.getElementById("dialogue").style.display =
+        "none";
+
+}
+
+
+/* =========================
+   INVENTORY
+========================= */
+
+function updateInventory() {
+
+    const slots =
+        document.querySelectorAll(".item");
+
+    slots.forEach(function(slot, index) {
+
+        if (inventory[index]) {
+
+            slot.innerText =
+                inventory[index];
+
+        } else {
+
+            slot.innerText =
+                "EMPTY";
+
+        }
+
+    });
+
+}
+
+
+/* =========================
+   FLASHLIGHT
+========================= */
+
+document.addEventListener("mousemove", function(event) {
+
+    if (lightsOn) {
+        return;
+    }
+
+    const x = event.clientX;
+    const y = event.clientY;
+
+    document.documentElement.style
+        .setProperty("--x", x + "px");
+
+    document.documentElement.style
+        .setProperty("--y", y + "px");
+
+    const flashlight =
+        document.getElementById("flashlight");
+
+    flashlight.style.left =
+        x + "px";
+
+    flashlight.style.top =
+        y + "px";
+
+});
+
+
+/* =========================
+   OBJECTS
+========================= */
+
+function inspectChair() {
+
+    if (lightsOn) {
+
+        say(
+            "An old chair.\n\n" +
+            "Nobody is sitting in it."
+        );
+
+        return;
+    }
+
+    say(
+        "You can barely make out a chair."
+    );
+
+}
+
+
+function inspectTable() {
+
+    if (lightsOn) {
+
+        say(
+            "The table is covered in dust.\n\n" +
+            "Something was recently dragged across it."
+        );
+
+        return;
+    }
+
+    say(
+        "Something is blocking the light."
+    );
+
+}
+
+
+/* =========================
+   LIGHT SWITCH
+========================= */
+
+function flipSwitch() {
+
+    if (lightsOn) {
+
+        say(
+            "The switch doesn't respond."
+        );
+
+        return;
+    }
+
+
+    lightsOn = true;
+
+
+    document.getElementById("darkness")
+        .style.display = "none";
+
+    document.getElementById("flashlight")
+        .style.display = "none";
+
+    document.getElementById("fullLight")
+        .style.display = "block";
+
+
+    say(
+        "You found the light switch.\n\n" +
+        "CLICK."
+    );
+
+
+    setTimeout(function() {
+
+        revealMonster();
+
+    }, 1200);
+
+}
+
+
+/* =========================
+   MONSTER
+========================= */
+
+function revealMonster() {
+
+    document.getElementById("monster")
+        .style.display = "block";
+
+
+    say(
+        "There is someone standing in the room."
+    );
+
+
+    setTimeout(function() {
+
+        scareSequence();
+
+    }, 1800);
+
+}
+
+
+/* =========================
+   MONSTER DISAPPEARS
+========================= */
+
+function scareSequence() {
+
+    const game =
+        document.getElementById("game");
+
+    game.classList.add("flicker");
+
+
+    setTimeout(function() {
+
+        game.classList.remove("flicker");
+
+        document.getElementById("fullLight")
+            .style.display = "none";
+
+        document.getElementById("monster")
+            .style.display = "none";
+
+        monsterGone = true;
+
+
+        say(
+            "The lights stabilize.\n\n" +
+            "The room is empty.\n\n" +
+            "You are certain something was here."
+        );
+
+    }, 900);
+
+}
+
+
+/* =========================
+   EXIT DOOR
+========================= */
+
+function openDoor() {
+
+    if (!lightsOn) {
+
+        say(
+            "You can't see the door clearly."
+        );
+
+        return;
+    }
+
+
+    if (!monsterGone) {
+
+        say(
+            "You should probably figure out " +
+            "what is happening first."
+        );
+
+        return;
+    }
+
+
+    say(
+        "You reach for the handle.\n\n" +
+        "The door opens."
+    );
+
+
+    setTimeout(function() {
+
+        window.location.href =
+            "room4.html";
+
+    }, 1500);
+
+}
+
+
+/* =========================
+   STARTUP
+========================= */
+
+updateInventory();
+
+
+/* INITIAL FLASHLIGHT POSITION */
+
+document.documentElement.style
+    .setProperty("--x", "50vw");
+
+document.documentElement.style
+    .setProperty("--y", "50vh");
+
+</script>
+
+</body>
+</html>
