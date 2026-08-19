@@ -39,41 +39,28 @@ body {
         );
 }
 
-
-/* ROOM NAME */
-
 #roomName {
     position: absolute;
-
     top: 15px;
     left: 20px;
-
     color: #666;
-
     font-size: 13px;
-
     z-index: 20;
 }
 
-
-/* OBJECTS */
-
 .object {
     position: absolute;
-
     cursor: pointer;
-
     transition: .15s;
 }
 
 .object:hover {
     filter: brightness(1.5);
-
     outline: 1px solid #777;
 }
 
 
-/* DOOR BEHIND PLAYER */
+/* BACK DOOR */
 
 #backDoor {
     width: 120px;
@@ -83,8 +70,9 @@ body {
     bottom: 15%;
 
     background: #211813;
-
     border: 6px solid #0d0b0a;
+
+    z-index: 2;
 }
 
 
@@ -98,8 +86,9 @@ body {
     bottom: 15%;
 
     background: #211813;
-
     border: 6px solid #0d0b0a;
+
+    z-index: 2;
 }
 
 #exitKnob {
@@ -112,7 +101,6 @@ body {
     height: 14px;
 
     border-radius: 50%;
-
     background: #aaa;
 }
 
@@ -127,11 +115,12 @@ body {
     top: 25%;
 
     background: #080808;
-
     border: 10px solid #171717;
 
     box-shadow:
         0 0 20px rgba(255,255,255,.05);
+
+    z-index: 2;
 }
 
 #screen {
@@ -141,7 +130,6 @@ body {
     margin: 10px auto;
 
     background: #101010;
-
     color: #777;
 
     display: flex;
@@ -149,7 +137,6 @@ body {
     justify-content: center;
 
     text-align: center;
-
     font-size: 12px;
 }
 
@@ -164,10 +151,11 @@ body {
     top: 22%;
 
     background: #302820;
-
     border: 8px solid #17120f;
 
     transform: rotate(-4deg);
+
+    z-index: 5;
 }
 
 #pictureInside {
@@ -177,7 +165,6 @@ body {
     margin: 10px auto;
 
     background: #171717;
-
     color: #555;
 
     display: flex;
@@ -185,6 +172,24 @@ body {
     justify-content: center;
 
     font-size: 9px;
+}
+
+
+/* HAMMER */
+
+#hammer {
+    position: absolute;
+
+    left: 20%;
+    top: 37%;
+
+    font-size: 30px;
+
+    display: none;
+
+    cursor: pointer;
+
+    z-index: 6;
 }
 
 
@@ -197,7 +202,6 @@ body {
     bottom: 25%;
 
     color: #777;
-
     font-size: 12px;
 
     transform: rotate(-2deg);
@@ -219,7 +223,6 @@ body {
     min-height: 80px;
 
     background: rgba(0,0,0,.95);
-
     border: 1px solid #555;
 
     padding: 18px;
@@ -248,15 +251,12 @@ body {
     height: 65px;
 
     background: #090909;
-
     border-top: 1px solid #444;
 
     display: flex;
-
     align-items: center;
 
     padding: 8px;
-
     gap: 8px;
 
     z-index: 40;
@@ -269,7 +269,6 @@ body {
     border: 1px solid #444;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
@@ -277,7 +276,7 @@ body {
 }
 
 
-/* FLICKERING LIGHT */
+/* LIGHT */
 
 #light {
     position: absolute;
@@ -322,13 +321,12 @@ body {
 
 <div id="light"></div>
 
-
 <div id="roomName">
     ROOM 02 // HALLWAY
 </div>
 
 
-<!-- DOOR BACK TO ROOM 1 -->
+<!-- BACK DOOR -->
 
 <div
     id="backDoor"
@@ -365,7 +363,19 @@ body {
 </div>
 
 
-<!-- WALL MESSAGE -->
+<!-- HAMMER -->
+
+<div
+    id="hammer"
+    class="object"
+    onclick="takeHammer()">
+
+    🔨
+
+</div>
+
+
+<!-- WALL -->
 
 <div
     id="wallMessage"
@@ -403,21 +413,10 @@ body {
 
 <div id="inventory">
 
-    <div class="item">
-        EMPTY
-    </div>
-
-    <div class="item">
-        EMPTY
-    </div>
-
-    <div class="item">
-        EMPTY
-    </div>
-
-    <div class="item">
-        EMPTY
-    </div>
+    <div class="item">EMPTY</div>
+    <div class="item">EMPTY</div>
+    <div class="item">EMPTY</div>
+    <div class="item">EMPTY</div>
 
 </div>
 
@@ -425,6 +424,24 @@ body {
 
 
 <script>
+
+/* =========================
+   GAME DATA
+========================= */
+
+let inventory =
+    JSON.parse(localStorage.getItem("inventory")) || [];
+
+let pictureTakenDown =
+    localStorage.getItem("pictureTakenDown") === "true";
+
+let hammerTaken =
+    localStorage.getItem("hammerTaken") === "true";
+
+
+/* =========================
+   DIALOGUE
+========================= */
 
 function say(text) {
 
@@ -442,13 +459,63 @@ function closeDialogue() {
 }
 
 
-/* TV */
+/* =========================
+   INVENTORY
+========================= */
+
+function updateInventory() {
+
+    const slots =
+        document.querySelectorAll(".item");
+
+    slots.forEach(function(slot, index) {
+
+        if (inventory[index]) {
+
+            slot.innerText =
+                inventory[index];
+
+        } else {
+
+            slot.innerText =
+                "EMPTY";
+
+        }
+
+    });
+
+}
+
+
+function addItem(item) {
+
+    if (inventory.includes(item)) {
+        return;
+    }
+
+    inventory.push(item);
+
+    localStorage.setItem(
+        "inventory",
+        JSON.stringify(inventory)
+    );
+
+    updateInventory();
+
+}
+
+
+/* =========================
+   TV
+========================= */
 
 function inspectTV() {
 
-    const screen = document.getElementById("screen");
+    const screen =
+        document.getElementById("screen");
 
-    screen.innerText = "SIGNAL FOUND";
+    screen.innerText =
+        "SIGNAL FOUND";
 
     say(
         "The television clicks on.\n\n" +
@@ -459,20 +526,122 @@ function inspectTV() {
 }
 
 
-/* PICTURE */
+/* =========================
+   PICTURE
+========================= */
 
 function inspectPicture() {
 
+    /* ALREADY REMOVED */
+
+    if (pictureTakenDown) {
+
+        if (!hammerTaken) {
+
+            document.getElementById(
+                "hammer"
+            ).style.display = "block";
+
+            say(
+                "The painting is gone.\n\n" +
+                "There is something hidden behind it."
+            );
+
+            return;
+        }
+
+        say(
+            "There's nothing behind the painting anymore."
+        );
+
+        return;
+    }
+
+
+    /* NEED GRABBER */
+
+    if (!inventory.includes("GRABBER")) {
+
+        say(
+            "The painting is firmly attached to the wall.\n\n" +
+            "You can't get a good grip on it."
+        );
+
+        return;
+    }
+
+
+    /* TAKE DOWN */
+
+    pictureTakenDown = true;
+
+    localStorage.setItem(
+        "pictureTakenDown",
+        "true"
+    );
+
+    document.getElementById(
+        "picture"
+    ).style.transform =
+        "rotate(-4deg) translateY(-300px)";
+
+    document.getElementById(
+        "picture"
+    ).style.opacity = "0";
+
+
     say(
-        "The picture is faded.\n\n" +
-        "You can't recognize anyone in it.\n\n" +
-        "But you have the strange feeling that you've seen them before."
+        "You use the grabber to pull the painting down.\n\n" +
+        "It falls to the floor.\n\n" +
+        "Something is hidden behind it..."
+    );
+
+
+    setTimeout(function() {
+
+        document.getElementById(
+            "hammer"
+        ).style.display = "block";
+
+    }, 800);
+
+}
+
+
+/* =========================
+   HAMMER
+========================= */
+
+function takeHammer() {
+
+    if (hammerTaken) {
+        return;
+    }
+
+    hammerTaken = true;
+
+    localStorage.setItem(
+        "hammerTaken",
+        "true"
+    );
+
+    document.getElementById(
+        "hammer"
+    ).style.display = "none";
+
+    addItem("HAMMER");
+
+    say(
+        "You pick up the hammer.\n\n" +
+        "It's heavier than it looks."
     );
 
 }
 
 
-/* WALL */
+/* =========================
+   WALL
+========================= */
 
 function inspectWall() {
 
@@ -485,23 +654,78 @@ function inspectWall() {
 }
 
 
-/* BACK DOOR */
+/* =========================
+   BACK DOOR
+========================= */
 
 function goBack() {
 
-    window.location.href = "index.html";
+    window.location.href =
+        "index.html";
 
 }
 
 
-/* EXIT */
+/* =========================
+   EXIT
+========================= */
 
 function openExit() {
 
+    if (!inventory.includes("HAMMER")) {
+
+        say(
+            "The door is locked.\n\n" +
+            "There is no keyhole.\n\n" +
+            "Something has been nailed shut."
+        );
+
+        return;
+    }
+
+
     say(
-        "The door is locked.\n\n" +
-        "There is no keyhole."
+        "You raise the hammer.\n\n" +
+        "CRACK.\n\n" +
+        "The door gives way."
     );
+
+
+    setTimeout(function() {
+
+        window.location.href =
+            "room3.html";
+
+    }, 1500);
+
+}
+
+
+/* =========================
+   STARTUP
+========================= */
+
+updateInventory();
+
+
+/* KEEP HAMMER VISIBLE */
+
+if (pictureTakenDown && !hammerTaken) {
+
+    document.getElementById(
+        "hammer"
+    ).style.display = "block";
+
+}
+
+
+/* KEEP PICTURE REMOVED */
+
+if (pictureTakenDown) {
+
+    document.getElementById(
+        "picture"
+    ).style.opacity = "0";
 
 }
 
