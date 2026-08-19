@@ -554,13 +554,14 @@ function readNote() {
 
 function inspectComputer() {
 
-    /* COMPUTER ALREADY BROKEN */
+    /* COMPUTER IS ALREADY BROKEN */
 
     if (computerBroken) {
 
         if (!grabberTaken) {
 
-            document.getElementById("grabber").style.display = "block";
+            document.getElementById("grabber").style.display =
+                "block";
 
             say(
                 "The screen is shattered.\n\n" +
@@ -585,18 +586,18 @@ function inspectComputer() {
         "NO SIGNAL\n\n" +
         "Then a message appears:\n\n" +
         "HELLO, EVAN.\n\n" +
-        "You notice something behind the screen."
+        "Something feels wrong about this computer."
     );
 
 
-    /* SECOND CLICK WILL BREAK IT */
+    /*
+       IMPORTANT:
+       This is the actual function assignment.
+       No quotes!
+    */
 
-    setTimeout(function() {
-
-        document.getElementById("computer").onclick =
-            "smashComputer()";
-
-    }, 100);
+    document.getElementById("computer").onclick =
+        smashComputer;
 
 }
 
@@ -614,8 +615,12 @@ function smashComputer() {
         "true"
     );
 
+
+    /* CHANGE SCREEN */
+
     document.getElementById("computerScreen").innerText =
         "BROKEN";
+
 
     say(
         "You hit the screen.\n\n" +
@@ -624,8 +629,14 @@ function smashComputer() {
         "Something falls behind the computer."
     );
 
+
+    /* CHANGE COMPUTER BACK TO INSPECT */
+
     document.getElementById("computer").onclick =
-        "inspectComputer()";
+        inspectComputer;
+
+
+    /* SHOW GRABBER */
 
     document.getElementById("grabber").style.display =
         "block";
@@ -643,17 +654,22 @@ function takeGrabber() {
         return;
     }
 
+
     grabberTaken = true;
+
 
     localStorage.setItem(
         "grabberTaken",
         "true"
     );
 
+
     document.getElementById("grabber").style.display =
         "none";
 
+
     addItem("GRABBER");
+
 
     say(
         "You pull it free.\n\n" +
@@ -694,10 +710,13 @@ function openDrawer() {
         return;
     }
 
+
     drawerOpen = true;
+
 
     document.getElementById("key").style.display =
         "block";
+
 
     say(
         "You open the drawer.\n\n" +
@@ -717,12 +736,16 @@ function takeKey() {
         return;
     }
 
+
     keyTaken = true;
+
 
     document.getElementById("key").style.display =
         "none";
 
+
     addItem("KEY");
+
 
     say(
         "You picked up the key."
@@ -754,6 +777,7 @@ function openDoor() {
 
 
     doorOpened = true;
+
 
     say(
         "The key fits.\n\n" +
@@ -792,7 +816,7 @@ function openDoor() {
 updateInventory();
 
 
-/* KEEP COMPUTER STATE */
+/* KEEP COMPUTER BROKEN */
 
 if (computerBroken) {
 
@@ -803,13 +827,26 @@ if (computerBroken) {
 }
 
 
-/* SHOW GRABBER IF NEEDED */
+/* SHOW GRABBER IF COMPUTER
+   IS BROKEN AND IT HASN'T
+   BEEN TAKEN */
 
 if (computerBroken && !grabberTaken) {
 
     document.getElementById(
         "grabber"
     ).style.display = "block";
+
+}
+
+
+/* HIDE GRABBER IF ALREADY TAKEN */
+
+if (grabberTaken) {
+
+    document.getElementById(
+        "grabber"
+    ).style.display = "none";
 
 }
 
