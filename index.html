@@ -424,21 +424,10 @@ body {
 
     <div id="inventory">
 
-        <div class="item" id="item1">
-            EMPTY
-        </div>
-
-        <div class="item" id="item2">
-            EMPTY
-        </div>
-
-        <div class="item" id="item3">
-            EMPTY
-        </div>
-
-        <div class="item" id="item4">
-            EMPTY
-        </div>
+        <div class="item" id="item1">EMPTY</div>
+        <div class="item" id="item2">EMPTY</div>
+        <div class="item" id="item3">EMPTY</div>
+        <div class="item" id="item4">EMPTY</div>
 
     </div>
 
@@ -451,23 +440,63 @@ body {
 <script>
 
 /* =========================
-   GAME DATA
+   GAME STATE
 ========================= */
 
+/*
+   EVERYTHING IMPORTANT IS SAVED.
+*/
+
 let inventory =
-    JSON.parse(localStorage.getItem("inventory")) || [];
+    JSON.parse(localStorage.getItem("inventory") || "[]");
 
-let drawerOpen = false;
+let drawerOpen =
+    localStorage.getItem("drawerOpen") === "true";
 
-let keyTaken = false;
-
-let doorOpened = false;
+let keyTaken =
+    localStorage.getItem("keyTaken") === "true";
 
 let computerBroken =
     localStorage.getItem("computerBroken") === "true";
 
 let grabberTaken =
     localStorage.getItem("grabberTaken") === "true";
+
+let doorOpened = false;
+
+
+/* =========================
+   SAVE GAME
+========================= */
+
+function saveGame() {
+
+    localStorage.setItem(
+        "inventory",
+        JSON.stringify(inventory)
+    );
+
+    localStorage.setItem(
+        "drawerOpen",
+        drawerOpen
+    );
+
+    localStorage.setItem(
+        "keyTaken",
+        keyTaken
+    );
+
+    localStorage.setItem(
+        "computerBroken",
+        computerBroken
+    );
+
+    localStorage.setItem(
+        "grabberTaken",
+        grabberTaken
+    );
+
+}
 
 
 /* =========================
@@ -496,19 +525,13 @@ function closeDialogue() {
 
 function updateInventory() {
 
-    const slots = document.querySelectorAll(".item");
+    const slots =
+        document.querySelectorAll(".item");
 
     slots.forEach(function(slot, index) {
 
-        if (inventory[index]) {
-
-            slot.innerText = inventory[index];
-
-        } else {
-
-            slot.innerText = "EMPTY";
-
-        }
+        slot.innerText =
+            inventory[index] || "EMPTY";
 
     });
 
@@ -523,10 +546,7 @@ function addItem(item) {
 
     inventory.push(item);
 
-    localStorage.setItem(
-        "inventory",
-        JSON.stringify(inventory)
-    );
+    saveGame();
 
     updateInventory();
 
@@ -554,19 +574,17 @@ function readNote() {
 
 function inspectComputer() {
 
-    /* COMPUTER IS ALREADY BROKEN */
-
     if (computerBroken) {
 
         if (!grabberTaken) {
-
-            document.getElementById("grabber").style.display =
-                "block";
 
             say(
                 "The screen is shattered.\n\n" +
                 "Something is sticking out from behind it."
             );
+
+            document.getElementById("grabber").style.display =
+                "block";
 
             return;
         }
@@ -579,8 +597,6 @@ function inspectComputer() {
     }
 
 
-    /* FIRST CLICK */
-
     say(
         "The computer turns on by itself.\n\n" +
         "NO SIGNAL\n\n" +
@@ -591,9 +607,8 @@ function inspectComputer() {
 
 
     /*
-       IMPORTANT:
-       This is the actual function assignment.
-       No quotes!
+       The FIRST click only examines it.
+       After the message, clicking it again smashes it.
     */
 
     document.getElementById("computer").onclick =
@@ -610,17 +625,10 @@ function smashComputer() {
 
     computerBroken = true;
 
-    localStorage.setItem(
-        "computerBroken",
-        "true"
-    );
-
-
-    /* CHANGE SCREEN */
+    saveGame();
 
     document.getElementById("computerScreen").innerText =
         "BROKEN";
-
 
     say(
         "You hit the screen.\n\n" +
@@ -630,13 +638,13 @@ function smashComputer() {
     );
 
 
-    /* CHANGE COMPUTER BACK TO INSPECT */
-
     document.getElementById("computer").onclick =
         inspectComputer;
 
 
-    /* SHOW GRABBER */
+    /*
+       NOW the grabber becomes available.
+    */
 
     document.getElementById("grabber").style.display =
         "block";
@@ -650,6 +658,15 @@ function smashComputer() {
 
 function takeGrabber() {
 
+    if (!computerBroken) {
+
+        say(
+            "You can't reach it."
+        );
+
+        return;
+    }
+
     if (grabberTaken) {
         return;
     }
@@ -657,18 +674,13 @@ function takeGrabber() {
 
     grabberTaken = true;
 
+    addItem("GRABBER");
 
-    localStorage.setItem(
-        "grabberTaken",
-        "true"
-    );
+    saveGame();
 
 
     document.getElementById("grabber").style.display =
         "none";
-
-
-    addItem("GRABBER");
 
 
     say(
@@ -713,6 +725,12 @@ function openDrawer() {
 
     drawerOpen = true;
 
+    saveGame();
+
+
+    /*
+       NOW the key appears.
+    */
 
     document.getElementById("key").style.display =
         "block";
@@ -732,6 +750,15 @@ function openDrawer() {
 
 function takeKey() {
 
+    if (!drawerOpen) {
+
+        say(
+            "The drawer is closed."
+        );
+
+        return;
+    }
+
     if (keyTaken) {
         return;
     }
@@ -739,12 +766,13 @@ function takeKey() {
 
     keyTaken = true;
 
+    addItem("KEY");
+
+    saveGame();
+
 
     document.getElementById("key").style.display =
         "none";
-
-
-    addItem("KEY");
 
 
     say(
@@ -813,42 +841,73 @@ function openDoor() {
    STARTUP
 ========================= */
 
-updateInventory();
+function loadRoom() {
+
+    updateInventory();
 
 
-/* KEEP COMPUTER BROKEN */
+    /*
+       KEY
+    */
 
-if (computerBroken) {
+    if (drawerOpen && !keyTaken) {
 
-    document.getElementById(
-        "computerScreen"
-    ).innerText = "BROKEN";
+        document.getElementById("key").style.display =
+            "block";
+
+    } else {
+
+        document.getElementById("key").style.display =
+            "none";
+
+    }
+
+
+    /*
+       COMPUTER
+    */
+
+    if (computerBroken) {
+
+        document.getElementById(
+            "computerScreen"
+        ).innerText = "BROKEN";
+
+        document.getElementById("computer").onclick =
+            inspectComputer;
+
+    } else {
+
+        document.getElementById(
+            "computerScreen"
+        ).innerText = "NO SIGNAL";
+
+        document.getElementById("computer").onclick =
+            inspectComputer;
+
+    }
+
+
+    /*
+       GRABBER
+    */
+
+    if (computerBroken && !grabberTaken) {
+
+        document.getElementById("grabber").style.display =
+            "block";
+
+    } else {
+
+        document.getElementById("grabber").style.display =
+            "none";
+
+    }
 
 }
 
 
-/* SHOW GRABBER IF COMPUTER
-   IS BROKEN AND IT HASN'T
-   BEEN TAKEN */
-
-if (computerBroken && !grabberTaken) {
-
-    document.getElementById(
-        "grabber"
-    ).style.display = "block";
-
-}
-
-
-/* HIDE GRABBER IF ALREADY TAKEN */
-
-if (grabberTaken) {
-
-    document.getElementById(
-        "grabber"
-    ).style.display = "none";
-
-}
+loadRoom();
 
 </script>
 
