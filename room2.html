@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ROOM 02</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #050505;
+    color: #ddd;
+    font-family: monospace;
+    overflow: hidden;
+}
+
+#game {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+
+    background:
+        linear-gradient(
+            rgba(0,0,0,.3),
+            rgba(0,0,0,.8)
+        ),
+        linear-gradient(
+            90deg,
+            #171717,
+            #292929,
+            #111
+        );
+}
+
+
+/* ROOM NAME */
+
+#roomName {
+    position: absolute;
+
+    top: 15px;
+    left: 20px;
+
+    color: #666;
+
+    font-size: 13px;
+
+    z-index: 20;
+}
+
+
+/* OBJECTS */
+
+.object {
+    position: absolute;
+
+    cursor: pointer;
+
+    transition: .15s;
+}
+
+.object:hover {
+    filter: brightness(1.5);
+
+    outline: 1px solid #777;
+}
+
+
+/* DOOR BEHIND PLAYER */
+
+#backDoor {
+    width: 120px;
+    height: 250px;
+
+    left: 8%;
+    bottom: 15%;
+
+    background: #211813;
+
+    border: 6px solid #0d0b0a;
+}
+
+
+/* EXIT DOOR */
+
+#exitDoor {
+    width: 130px;
+    height: 280px;
+
+    right: 10%;
+    bottom: 15%;
+
+    background: #211813;
+
+    border: 6px solid #0d0b0a;
+}
+
+#exitKnob {
+    position: absolute;
+
+    right: 15px;
+    top: 50%;
+
+    width: 14px;
+    height: 14px;
+
+    border-radius: 50%;
+
+    background: #aaa;
+}
+
+
+/* TV */
+
+#tv {
+    width: 220px;
+    height: 150px;
+
+    left: 38%;
+    top: 25%;
+
+    background: #080808;
+
+    border: 10px solid #171717;
+
+    box-shadow:
+        0 0 20px rgba(255,255,255,.05);
+}
+
+#screen {
+    width: 180px;
+    height: 105px;
+
+    margin: 10px auto;
+
+    background: #101010;
+
+    color: #777;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    font-size: 12px;
+}
+
+
+/* PICTURE */
+
+#picture {
+    width: 100px;
+    height: 130px;
+
+    left: 18%;
+    top: 22%;
+
+    background: #302820;
+
+    border: 8px solid #17120f;
+
+    transform: rotate(-4deg);
+}
+
+#pictureInside {
+    width: 70px;
+    height: 95px;
+
+    margin: 10px auto;
+
+    background: #171717;
+
+    color: #555;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 9px;
+}
+
+
+/* WALL MESSAGE */
+
+#wallMessage {
+    position: absolute;
+
+    left: 42%;
+    bottom: 25%;
+
+    color: #777;
+
+    font-size: 12px;
+
+    transform: rotate(-2deg);
+
+    cursor: pointer;
+}
+
+
+/* DIALOGUE */
+
+#dialogue {
+    position: absolute;
+
+    left: 5%;
+    right: 5%;
+
+    bottom: 90px;
+
+    min-height: 80px;
+
+    background: rgba(0,0,0,.95);
+
+    border: 1px solid #555;
+
+    padding: 18px;
+
+    display: none;
+
+    cursor: pointer;
+
+    z-index: 30;
+}
+
+#dialogueText {
+    line-height: 1.5;
+}
+
+
+/* INVENTORY */
+
+#inventory {
+    position: absolute;
+
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    height: 65px;
+
+    background: #090909;
+
+    border-top: 1px solid #444;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 8px;
+
+    gap: 8px;
+
+    z-index: 40;
+}
+
+.item {
+    width: 50px;
+    height: 50px;
+
+    border: 1px solid #444;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 11px;
+}
+
+
+/* FLICKERING LIGHT */
+
+#light {
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    background: rgba(255,255,255,.02);
+
+    animation: flicker 4s infinite;
+}
+
+@keyframes flicker {
+
+    0%, 90%, 100% {
+        opacity: 1;
+    }
+
+    92% {
+        opacity: .2;
+    }
+
+    94% {
+        opacity: .8;
+    }
+
+    96% {
+        opacity: .3;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div id="game">
+
+<div id="light"></div>
+
+
+<div id="roomName">
+    ROOM 02 // HALLWAY
+</div>
+
+
+<!-- DOOR BACK TO ROOM 1 -->
+
+<div
+    id="backDoor"
+    class="object"
+    onclick="goBack()">
+</div>
+
+
+<!-- TV -->
+
+<div
+    id="tv"
+    class="object"
+    onclick="inspectTV()">
+
+    <div id="screen">
+        NO SIGNAL
+    </div>
+
+</div>
+
+
+<!-- PICTURE -->
+
+<div
+    id="picture"
+    class="object"
+    onclick="inspectPicture()">
+
+    <div id="pictureInside">
+        UNKNOWN
+    </div>
+
+</div>
+
+
+<!-- WALL MESSAGE -->
+
+<div
+    id="wallMessage"
+    onclick="inspectWall()">
+
+    THEY ARE NOT THEMSELVES.
+
+</div>
+
+
+<!-- EXIT -->
+
+<div
+    id="exitDoor"
+    class="object"
+    onclick="openExit()">
+
+    <div id="exitKnob"></div>
+
+</div>
+
+
+<!-- DIALOGUE -->
+
+<div
+    id="dialogue"
+    onclick="closeDialogue()">
+
+    <div id="dialogueText"></div>
+
+</div>
+
+
+<!-- INVENTORY -->
+
+<div id="inventory">
+
+    <div class="item">
+        EMPTY
+    </div>
+
+    <div class="item">
+        EMPTY
+    </div>
+
+    <div class="item">
+        EMPTY
+    </div>
+
+    <div class="item">
+        EMPTY
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+function say(text) {
+
+    document.getElementById("dialogueText").innerText = text;
+
+    document.getElementById("dialogue").style.display = "block";
+
+}
+
+
+function closeDialogue() {
+
+    document.getElementById("dialogue").style.display = "none";
+
+}
+
+
+/* TV */
+
+function inspectTV() {
+
+    const screen = document.getElementById("screen");
+
+    screen.innerText = "SIGNAL FOUND";
+
+    say(
+        "The television clicks on.\n\n" +
+        "There shouldn't be any signal here.\n\n" +
+        "Something is transmitting."
+    );
+
+}
+
+
+/* PICTURE */
+
+function inspectPicture() {
+
+    say(
+        "The picture is faded.\n\n" +
+        "You can't recognize anyone in it.\n\n" +
+        "But you have the strange feeling that you've seen them before."
+    );
+
+}
+
+
+/* WALL */
+
+function inspectWall() {
+
+    say(
+        "The writing looks old.\n\n" +
+        "But the wall underneath it is still wet.\n\n" +
+        "THEY ARE NOT THEMSELVES."
+    );
+
+}
+
+
+/* BACK DOOR */
+
+function goBack() {
+
+    window.location.href = "index.html";
+
+}
+
+
+/* EXIT */
+
+function openExit() {
+
+    say(
+        "The door is locked.\n\n" +
+        "There is no keyhole."
+    );
+
+}
+
+</script>
+
+</body>
+</html>
