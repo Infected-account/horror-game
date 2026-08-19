@@ -107,6 +107,24 @@ body {
 }
 
 
+/* GRABBER */
+
+#grabber {
+    position: absolute;
+
+    left: 30%;
+    bottom: 28%;
+
+    font-size: 30px;
+
+    display: none;
+
+    cursor: pointer;
+
+    z-index: 6;
+}
+
+
 /* COMPUTER */
 
 #computer {
@@ -339,6 +357,18 @@ body {
         </div>
 
 
+        <!-- GRABBER -->
+
+        <div
+            id="grabber"
+            class="object"
+            onclick="takeGrabber()">
+
+            🪝
+
+        </div>
+
+
         <!-- COMPUTER -->
 
         <div
@@ -420,7 +450,12 @@ body {
 
 <script>
 
-let inventory = [];
+/* =========================
+   GAME DATA
+========================= */
+
+let inventory =
+    JSON.parse(localStorage.getItem("inventory")) || [];
 
 let drawerOpen = false;
 
@@ -428,8 +463,16 @@ let keyTaken = false;
 
 let doorOpened = false;
 
+let computerBroken =
+    localStorage.getItem("computerBroken") === "true";
 
-/* DIALOGUE */
+let grabberTaken =
+    localStorage.getItem("grabberTaken") === "true";
+
+
+/* =========================
+   DIALOGUE
+========================= */
 
 function say(text) {
 
@@ -447,7 +490,30 @@ function closeDialogue() {
 }
 
 
-/* INVENTORY */
+/* =========================
+   INVENTORY
+========================= */
+
+function updateInventory() {
+
+    const slots = document.querySelectorAll(".item");
+
+    slots.forEach(function(slot, index) {
+
+        if (inventory[index]) {
+
+            slot.innerText = inventory[index];
+
+        } else {
+
+            slot.innerText = "EMPTY";
+
+        }
+
+    });
+
+}
+
 
 function addItem(item) {
 
@@ -457,18 +523,19 @@ function addItem(item) {
 
     inventory.push(item);
 
-    const slot = document.querySelector(
-        `.item:nth-child(${inventory.length})`
+    localStorage.setItem(
+        "inventory",
+        JSON.stringify(inventory)
     );
 
-    if (slot) {
-        slot.innerText = item;
-    }
+    updateInventory();
 
 }
 
 
-/* NOTE */
+/* =========================
+   NOTE
+========================= */
 
 function readNote() {
 
@@ -481,21 +548,124 @@ function readNote() {
 }
 
 
-/* COMPUTER */
+/* =========================
+   COMPUTER
+========================= */
 
 function inspectComputer() {
+
+    /* COMPUTER ALREADY BROKEN */
+
+    if (computerBroken) {
+
+        if (!grabberTaken) {
+
+            document.getElementById("grabber").style.display = "block";
+
+            say(
+                "The screen is shattered.\n\n" +
+                "Something is sticking out from behind it."
+            );
+
+            return;
+        }
+
+        say(
+            "The computer is completely broken."
+        );
+
+        return;
+    }
+
+
+    /* FIRST CLICK */
 
     say(
         "The computer turns on by itself.\n\n" +
         "NO SIGNAL\n\n" +
         "Then a message appears:\n\n" +
-        "HELLO, EVAN."
+        "HELLO, EVAN.\n\n" +
+        "You notice something behind the screen."
+    );
+
+
+    /* SECOND CLICK WILL BREAK IT */
+
+    setTimeout(function() {
+
+        document.getElementById("computer").onclick =
+            "smashComputer()";
+
+    }, 100);
+
+}
+
+
+/* =========================
+   SMASH COMPUTER
+========================= */
+
+function smashComputer() {
+
+    computerBroken = true;
+
+    localStorage.setItem(
+        "computerBroken",
+        "true"
+    );
+
+    document.getElementById("computerScreen").innerText =
+        "BROKEN";
+
+    say(
+        "You hit the screen.\n\n" +
+        "CRACK.\n\n" +
+        "The glass shatters.\n\n" +
+        "Something falls behind the computer."
+    );
+
+    document.getElementById("computer").onclick =
+        "inspectComputer()";
+
+    document.getElementById("grabber").style.display =
+        "block";
+
+}
+
+
+/* =========================
+   TAKE GRABBER
+========================= */
+
+function takeGrabber() {
+
+    if (grabberTaken) {
+        return;
+    }
+
+    grabberTaken = true;
+
+    localStorage.setItem(
+        "grabberTaken",
+        "true"
+    );
+
+    document.getElementById("grabber").style.display =
+        "none";
+
+    addItem("GRABBER");
+
+    say(
+        "You pull it free.\n\n" +
+        "You found a GRABBER."
     );
 
 }
 
 
-/* WINDOW */
+/* =========================
+   WINDOW
+========================= */
 
 function inspectWindow() {
 
@@ -509,20 +679,25 @@ function inspectWindow() {
 }
 
 
-/* DESK */
+/* =========================
+   DESK
+========================= */
 
 function openDrawer() {
 
     if (drawerOpen) {
 
-        say("The drawer is already open.");
+        say(
+            "The drawer is already open."
+        );
 
         return;
     }
 
     drawerOpen = true;
 
-    document.getElementById("key").style.display = "block";
+    document.getElementById("key").style.display =
+        "block";
 
     say(
         "You open the drawer.\n\n" +
@@ -532,7 +707,9 @@ function openDrawer() {
 }
 
 
-/* KEY */
+/* =========================
+   KEY
+========================= */
 
 function takeKey() {
 
@@ -542,7 +719,8 @@ function takeKey() {
 
     keyTaken = true;
 
-    document.getElementById("key").style.display = "none";
+    document.getElementById("key").style.display =
+        "none";
 
     addItem("KEY");
 
@@ -553,13 +731,16 @@ function takeKey() {
 }
 
 
-/* DOOR */
+/* =========================
+   DOOR
+========================= */
 
 function openDoor() {
 
     if (doorOpened) {
         return;
     }
+
 
     if (!inventory.includes("KEY")) {
 
@@ -571,6 +752,7 @@ function openDoor() {
         return;
     }
 
+
     doorOpened = true;
 
     say(
@@ -578,21 +760,56 @@ function openDoor() {
         "The door slowly opens..."
     );
 
+
     setTimeout(function() {
 
-        const door = document.getElementById("door");
+        const door =
+            document.getElementById("door");
 
-        door.style.transform = "translateX(150px)";
-        door.style.opacity = "0";
+        door.style.transform =
+            "translateX(150px)";
+
+        door.style.opacity =
+            "0";
 
     }, 1000);
 
 
     setTimeout(function() {
 
-        window.location.href = "room2.html";
+        window.location.href =
+            "room2.html";
 
     }, 2000);
+
+}
+
+
+/* =========================
+   STARTUP
+========================= */
+
+updateInventory();
+
+
+/* KEEP COMPUTER STATE */
+
+if (computerBroken) {
+
+    document.getElementById(
+        "computerScreen"
+    ).innerText = "BROKEN";
+
+}
+
+
+/* SHOW GRABBER IF NEEDED */
+
+if (computerBroken && !grabberTaken) {
+
+    document.getElementById(
+        "grabber"
+    ).style.display = "block";
 
 }
 
